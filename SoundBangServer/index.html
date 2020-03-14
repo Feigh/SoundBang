@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="row">
+        <div class="column">
+            <div id="startgame">
+                <h2>Välkomen</h2>
+                <h4>Starta Ett nytt spel</h4>
+                <input type="button" class="submitbutton" onclick="StartGame()" value="Starta"></input>
+            </div>
+            <div id="waitforplayers">
+                <h2>Vänta på alla spelare</h2>
+                <label >Spel kod:</label>
+                <label id="sessioncode" ></label>
+                <ul id="ConnectedUsers" class="SelectionList"></ul>
+            </div>
+        </div>
+    </div>
+    <input id="sessioncodehidden" type="hidden" value="0">
+</body>
+</html>
+
+<style type="text/css">
+
+    .row {
+    float: left;
+    }
+    input{
+        margin-bottom: 5px;
+    }
+    .SelectionList{
+        margin: 0; 
+        padding: 0;
+        text-align: left;
+    }
+    .column {
+        width: 150px;
+        margin: 0 auto;
+    }
+    input{       
+        background-color:cyan;
+        border-style: none;
+        height: 30px;
+        border-radius: 10px;
+    }
+    .inputtext{
+        width:150px;
+        text-align: center;
+    }
+    .submitbutton{
+        width:150px;
+        background-color:dodgerblue;
+        border-style: none;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;   
+    }
+
+    body{
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;        
+        background-color: lightseagreen;
+    }
+</style>
+
+
+<script>
+
+    window.onload = function () {
+        ToggleActiveDiv();
+        UpdateLable();
+        }
+
+    function UpdateLable()
+    {
+        document.getElementById('sessioncode').innerHTML = document.getElementById('sessioncodehidden').value;
+    }
+    function ToggleActiveDiv()
+    {
+        var hidden = document.getElementById('sessioncodehidden').value;
+        if(hidden == 0 || hidden == undefined)
+        {
+            document.getElementById('waitforplayers').style.display= "none";
+            document.getElementById('startgame').style.display= "block";              
+            
+        }
+        else
+        {
+            document.getElementById('waitforplayers').style.display= "block";
+            document.getElementById('startgame').style.display= "none";         
+        }
+    }
+
+    function StartGame()
+    {
+        SubmitStartReceiveSessionName()
+        .then(result => {document.getElementById('sessioncodehidden').value = JSON.parse(result).SessionName})
+        .then(result => {ToggleActiveDiv(); UpdateLable();})
+    }
+
+    function SubmitStartReceiveSessionName(){
+        return $.ajax({
+            url: "http://localhost:4333/session",
+            dataType: 'text',
+            type: "GET",
+            contentType: "text/plain"
+        });
+    }
+
+</script>

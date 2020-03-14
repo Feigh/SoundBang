@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="row">
+        <div class="column">
+            <div id="ConnectSession">
+                <h2>Välkomen</h2>
+                <h4>Skriv in Spel koden som syns på skärmen</h4>
+                <label for="sessionname">Spel kod:</label>
+                <input id="sessionname" class="inputtext" type="text"></input>
+                <input type="button" class="submitbutton" onclick="ConnectToSession()" value="Starta"></input>
+            </div>
+            <div id="ConnectUser">
+                <label for="playername">Spelar Namn:</label>
+                <input id="playername" class="inputtext" type="text"></input>
+                <input type="button" class="submitbutton" onclick="StartGame()" value="Starta"></input>
+            </div>
+        </div>
+    </div>
+    <input id="sessionidhandler" onchange="" type="hidden" value="0">
+    <input id="playerid" onchange="" type="hidden" value="0">
+</body>
+</html>
+
+<style type="text/css">
+
+    .row {
+    float: left;
+    }
+    input{
+        margin-bottom: 5px;
+    }
+
+    .column {
+        width: 150px;
+        margin: 0 auto;
+    }
+    input{       
+        background-color:greenyellow;
+        border-style: none;
+        height: 30px;
+        border-radius: 10px;
+    }
+    .inputtext{
+        width:150px;
+        text-align: center;
+    }
+    .submitbutton{
+        width:150px;
+        background-color:limegreen;
+        border-style: none;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;   
+    }
+
+    body{
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;        
+        background-color: lightgreen;
+    }
+</style>
+
+<script>
+
+    window.onload = function () {
+        ToggleActiveDiv();
+        }
+    function ToggleActiveDiv()
+    {
+        console.log(document.getElementById('sessionidhandler').value);
+        console.log("stuff");
+        if(document.getElementById('sessionidhandler').value === 0)
+        {
+            document.getElementById('ConnectSession').style.display= "block";
+            document.getElementById('ConnectUser').style.display= "none";
+        }
+        else
+        {
+            document.getElementById('ConnectSession').style.display= "none";
+            document.getElementById('ConnectUser').style.display= "block";            
+        }
+    }
+
+    function ConnectToSession(){
+        var sessionName = document.getElementById('sessionname');
+        SubmitSessionNameReceiveOk(sessionName.value).then(result => 
+            {
+                var jsonrlt = JSON.parse(result)
+                document.getElementById('sessionidhandler').value = jsonrlt.SessionId;
+                document.getElementById('playerid').value = jsonrlt.Player.PlayerId;
+                ToggleActiveDiv();
+            }
+        );
+    }
+    function StartGame()
+    {
+        var playerName = document.getElementById('playername');
+        console.log(playerName.value)       
+        //SubmitPlayerNameReceiveServerCode(playerName.value);
+        SubmitPlayerNameReciveServerCodePromise(playerName.value).then(result => window.location="game.html");
+    }
+    function SubmitSessionNameReceiveOk(sessionname, playername){
+        return $.ajax({
+            url: "http://localhost:4333/session",
+            dataType: 'text',
+            type: "POST",
+            contentType: "text/plain",
+            data: JSON.stringify({SessionName : sessionname})
+        });
+    }
+    function SubmitSessionNameReceiveOk(sessionname, playername){
+        return $.ajax({
+            url: "http://localhost:4333/session",
+            dataType: 'text',
+            type: "POST",
+            contentType: "text/plain",
+            data: JSON.stringify({SessionName : sessionname})
+        });
+    }
+
+    function SubmitPlayerNameReciveServerCodePromise(playername){
+        return $.ajax({
+            url: "http://localhost:4333/player",
+            dataType: 'text',
+            type: "POST",
+            contentType: "text/plain",
+            data: playername
+        });
+    }
+
+    function SubmitPlayerNameReceiveServerCode(playername){
+        var http = new XMLHttpRequest();
+        var url = 'http://localhost:4333/player';
+        var params = playername;
+        http.open('POST', url, true);
+        http.setRequestHeader('Content-type', "text/plain");
+        http.send(params);
+    }
+</script>
